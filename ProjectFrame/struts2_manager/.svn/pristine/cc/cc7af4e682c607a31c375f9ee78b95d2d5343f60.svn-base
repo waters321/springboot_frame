@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+        
+<struts>
+	<!-- 所有的struts-xxx.xml文件中的package中的extends的值必须是default，因为在struts.xml中的根的package的name的值为default -->
+    <package name="user" namespace="/user" extends="default">
+    	<!-- 
+        <default-interceptor-ref name="authorityInterceptorStack"></default-interceptor-ref>
+    	-->   
+    	<!-- 默认的登录成功后的首页 -->
+    	<action name="index" class="com.sinocontact.core.action.HomeAction" method="index">
+            <result>/WEB-INF/views/index.jsp</result>
+        </action>
+        
+        <!-- login为ajax访问，返回的数据格式为json，所以本login的action不用设置result -->
+        <action name="login" class="com.sinocontact.core.action.user.UserAction" method="login">        
+        </action>
+        
+        <!-- 本action响应为图片验证码的切换图片的响应，返回的是生成图片的输入流 -->
+        <action name="generalVerify" class="com.sinocontact.core.action.user.UserAction" method="generalVerify">
+            <result name="success" type="stream">
+                <param name="contentType">image/jpeg</param>
+                <param name="inputName">inputStream</param>
+            </result>
+        </action>
+
+		<!-- logout为ajax访问，返回的数据格式为json，所以本logout的action不用设置result -->
+        <action name="logout" class="com.sinocontact.core.action.user.UserAction" method="logout">            
+        </action>		
+
+    </package>
+
+</struts>

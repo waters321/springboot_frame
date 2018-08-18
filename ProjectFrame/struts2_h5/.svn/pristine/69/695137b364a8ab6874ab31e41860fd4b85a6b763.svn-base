@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+
+    <!-- <constant name="struts.enable.DynamicMethodInvocation" value="false" />-->
+    <constant name="struts.devMode" value="false" />
+    <constant name="struts.action.extension" value=","/> 
+	<constant name="struts.multipart.maxSize" value="524288000"/>
+
+    
+    <include file="struts-activity.xml"></include>
+
+	<!-- 默认的所有struts-xxx.xml文件的根，所有的struts-xxx.xml中的package的extends的值必须和本处name的值一致 -->
+    <package name="default" namespace="/" extends="struts-default">
+
+		<!-- 拦截器定义 -->
+        <interceptors>
+        	<interceptor name="accesslog" class="com.sinocontact.interceptor.AccessLogInterceptor"/> 
+            <interceptor name="wxauth" class="com.sinocontact.interceptor.WxAuthInterceptor">
+            	<param name="excludeMethods">wechatAuth,wechatCallback</param>
+            </interceptor>
+            
+			<!-- 如果不需要访问日志拦截，从myStack中注释掉accesslog即可 -->
+            <interceptor-stack name="myStack">
+                <interceptor-ref name="defaultStack" />
+               	<interceptor-ref name="accesslog" />
+                <interceptor-ref name="wxauth" />                
+            </interceptor-stack>
+        </interceptors>
+
+		<!-- 拦截器堆设置 -->
+		<default-interceptor-ref name="myStack" />
+		
+		<!-- 全局result -->
+        <global-results>
+        	<!-- 全局的登录result -->
+            <result name="redirectToWechatAuth" type="redirectAction">
+            	<param name="actionName">wechatAuth</param>
+  				<param name="namespace">/</param>
+            </result>
+            <!-- 全局的异常页面统一访问的jsp页面 -->
+            <result name="Exception">/WEB-INF/views/common/error.jsp</result>
+        </global-results>			
+		
+		
+		<!-- 微信认证响应函数 -->
+		<action name="wechatAuth" class="com.sinocontact.core.action.WxAuthAction" method="wechatAuth">
+			 <result type="redirect">${wxAuthUrl}</result>
+        </action>
+        <!-- 微信授权后回调-->
+        <action name="wechatCallback" class="com.sinocontact.core.action.WxAuthAction" method="wechatCallback">
+			 <result type="redirect">${wxRedirectUrl}</result>
+        </action>
+        <!-- 用户进行微信分享后的回调响应函数 -->
+        <action name="onShareCallback" class="com.sinocontact.core.action.WxAuthAction" method="onShareCallback">			 
+        </action>
+        
+        
+    </package>
+        
+    
+	</struts>
